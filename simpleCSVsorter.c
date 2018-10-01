@@ -33,6 +33,7 @@ int err = 0;
     int *ptrkeycol = &keycol;
 
     char *field = NULL;
+		int keyType = 0;
 
 
 
@@ -52,13 +53,12 @@ int err = 0;
 
         free(tmp);
 		}
-	 }
-	int keyType = determineSortType(record);
-	// if(keyType == 1){
- //  MergeSort(&record);
-	// }
-	// else{
- //   printList(record);
- // }
+	}
+
+
+	 keyType = determineSortType(record);
+
+   MergeSort(&record, keyType);
+	 printList(record);
 return 0;
 }

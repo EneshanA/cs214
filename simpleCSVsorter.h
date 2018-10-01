@@ -12,26 +12,31 @@ int determineSortType(struct Record * tmp){
   int keyType = 0;
   while(tmp!=NULL)
     {
-      char *tmpkey = strdup(tmp->key);
-      printf("%lu\n", strlen(tmp->key));
-      for(int i = 0; i < strlen(tmpkey); i++){
-        if(isdigit(tmpkey[i]) || tmpkey[i] == '.'){
-          printf("IT is integer: \n");
-        }
-        else{
-          printf("it is string: \n");
-          keyType = 1;
-        }
-      }
+      // if(tmp->key != NULL){
+      // char *tmpkey = strdup(tmp->key);
+      // for(int i = 0; i < strlen(tmpkey)-1; i++){
+      //   printf("Lets see : %s\n", tmpkey);
+      //   printf("length %lu\n", strlen(tmpkey));
+      //   if(!isdigit(tmpkey[i]) || tmpkey[i] != '.'){
+      //     keyType = 1;
+      //     break;
+      //   }
+      // }
+      // printf("CHECKPOINT: \n");
       tmp = tmp->next;
     }
+  
     return keyType;
 }
 
 
 
-struct Record* SortedMerge(struct Record* a, struct Record* b);
+struct Record* SortedMergeInt(struct Record* a, struct Record* b);
+struct Record* SortedMergeString(struct Record* a, struct Record* b);
+
 void FrontBackSplit(struct Record* source, struct Record** frontRef, struct Record** backRef);
+
+//GETS KEYS AND LINES
 const char* getfield(char* line, int num)
 {
     const char* tok;
@@ -46,6 +51,7 @@ const char* getfield(char* line, int num)
     }
     return NULL;
 }
+//GETS COLUMN TO BE SORTED ON
 const char* getKey(char* line, char *key, int *ptrkeycol)
 {
   /* FROM FIRST LINE OF THE CSV FILE CHECKS IF COLUMN TO BE SORTED EXIST
@@ -62,6 +68,7 @@ const char* getKey(char* line, char *key, int *ptrkeycol)
     }
     return NULL;
 }
+ //PRINTS LIST
   void printList(struct Record *record)
   {
     while(record!=NULL)
@@ -71,6 +78,7 @@ const char* getKey(char* line, char *key, int *ptrkeycol)
         record = record->next;
       }
   }
+  //SPLITS LINKEDLIST
   void FrontBackSplit(struct Record* source,
         struct Record** frontRef, struct Record** backRef)
 {
@@ -96,7 +104,9 @@ const char* getKey(char* line, char *key, int *ptrkeycol)
     *backRef = slow->next;
     slow->next = NULL;
 }
-void MergeSort(struct Record** headRef)
+
+//MERGESORT
+void MergeSort(struct Record** headRef,int keyType)
 {
 
 struct Record* head = *headRef;
@@ -112,16 +122,18 @@ if ((head == NULL) || (head->next == NULL))
 FrontBackSplit(head, &a, &b);
 
 /* Recursively sort the sublists */
-MergeSort(&a);
-MergeSort(&b);
+MergeSort(&a, keyType);
+MergeSort(&b, keyType);
 
 /* answer = merge the two sorted lists together */
-*headRef = SortedMerge(a, b);
+  if(keyType == 1){
+    *headRef = SortedMergeInt(a, b); }
+  else{
+    *headRef = SortedMergeString(a,b);
+  }
 }
 
-/* See https://www.geeksforgeeks.org/?p=3622 for details of this
-function */
-struct Record* SortedMerge(struct Record* a, struct Record* b)
+struct Record* SortedMergeString(struct Record* a, struct Record* b)
 {
 struct Record* result = NULL;
 
@@ -135,12 +147,38 @@ else if (b==NULL)
 if (strcmp(a->key,b->key) < 0)
 {
     result = a;
-    result->next = SortedMerge(a->next, b);
+    result->next = SortedMergeString(a->next, b);
 }
 else
 {
     result = b;
-    result->next = SortedMerge(a, b->next);
+    result->next = SortedMergeString(a, b->next);
+}
+return(result);
+}
+
+struct Record* SortedMergeInt(struct Record* a, struct Record* b)
+{
+struct Record* result = NULL;
+int num1 = atoi(a->key);
+int num2 = atoi(b->key);
+
+/* Base cases */
+if (a == NULL)
+    return(b);
+else if (b==NULL)
+    return(a);
+
+/* Pick either a or b, and recur */
+if (num1 > num2)
+{
+    result = a;
+    result->next = SortedMergeInt(a->next, b);
+}
+else
+{
+    result = b;
+    result->next = SortedMergeInt(a, b->next);
 }
 return(result);
 }
