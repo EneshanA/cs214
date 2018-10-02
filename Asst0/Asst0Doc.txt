@@ -1,0 +1,39 @@
+CS-214 Assignment 0
+Due Date: 10/01/2018
+Owner of the Code: Eneshan Altunlu
+
+Design step by step:
+1)Check if arguments(argv[n]) are valid or not.
+2)Read the header line from csv directed to STDIN using getline() function.
+3a)Call getKey() function to seperate columns in one line by using strtok() function
+3b)Check if the argument entered matches with any column from header line if it does store the number of that column
+4)Depending on the column name decide which type of sorting is gonna be used(String or Double) by calling determineSortType()
+5a)Read the rest of rows in the CSV file using getline(), get key fields from rows using strsep() function
+5b)store each line and key fields in linkedlist by calling push() function
+6)Trim the quotes from each key field by calling trimQuotes() so later on sorting can be done properly.
+7)Call Merge Sort on the linked list by the sorting type
+8)Print sorted list
+
+Challenges:
+
+- At first I used strtok() function to seperate and check fields but later on I realized that
+ strtok() function is not able to handle empty spaces. So I had to use strsep()
+- For extra credit, I assumed every field is numeric and checked every field for non-digit character
+using isdigit() function but I had memory issues so I went with manuel if else statements.
+
+Functions:
+  a) Utility Functions:
+    1) trimQuotes() it takes string, trims the quotes.
+    2) SplitLL() takes the LinkedList, and seperates it into two.
+    3) getKey() it matches argv[2] with the column from header line and stores the column number.
+    4) getField() gets the nth column from line.
+  b) Main Functions
+    1)push() stores line and field in predefined structure
+    2)MergeSort(), SortLL() sorts the linkedlist using mergesort algorithm
+    3)printList() prints the LinkedList.
+
+To use:
+  gcc simpleCSVsorter.c -o simpleCSVsorter
+  cat input_file.csv | ./simpleCSVsorter -c <column_name>
+
+  It will sort the csv in ascending order and print to stdout.
